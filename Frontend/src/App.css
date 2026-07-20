@@ -1,0 +1,16 @@
+/* App — shell centra o conteúdo em desktop, mobile-first */
+.app {
+  min-height: 100vh;
+  background: var(--color-bg);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.app__shell {
+  width: 100%;
+  max-width: 375px;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}

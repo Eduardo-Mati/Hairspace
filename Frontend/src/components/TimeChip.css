@@ -1,0 +1,29 @@
+/* TimeChip */
+.time-chip {
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  transition: border-color 0.15s, color 0.15s, transform 0.1s, background 0.15s;
+  border: 1px solid var(--color-darker);
+  background: transparent;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+
+.time-chip:hover {
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+}
+
+.time-chip:active {
+  transform: scale(0.95);
+}
+
+.time-chip--selected {
+  background: var(--color-gold);
+  color: var(--color-bg);
+  border-color: var(--color-gold);
+}

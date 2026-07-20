@@ -1,0 +1,53 @@
+/* ==============================
+   Hairspace — Global CSS
+   ============================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@400;500;600&display=swap');
+
+:root {
+  --color-bg:      #0f0f0f;
+  --color-surface: #1a1712;
+  --color-surface2:#1e1a16;
+  --color-border:  #2a2520;
+  --color-gold:    #C9A84C;
+  --color-gold-h:  #d4b05c;
+  --color-text:    #f0ede0;
+  --color-muted:   #b0a898;
+  --color-dim:     #7a7060;
+  --color-faint:   #4a4540;
+  --color-darker:  #3a3530;
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-sans:    'DM Sans', system-ui, sans-serif;
+
+  --radius: 2px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+input {
+  font-family: inherit;
+}

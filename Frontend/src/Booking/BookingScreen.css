@@ -1,0 +1,210 @@
+/* BookingScreen */
+.booking {
+  min-height: 100vh;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.booking__form {
+  flex: 1;
+  padding: 24px 20px 112px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Field */
+.booking__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.booking__label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--color-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.booking__label-date-val {
+  color: var(--color-gold);
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 12px;
+}
+
+.booking__input {
+  width: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.booking__input::placeholder {
+  color: var(--color-faint);
+}
+
+.booking__input:focus {
+  border-color: var(--color-gold);
+}
+
+/* Location toggle */
+.booking__location-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.booking__location-opt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.booking__location-opt:hover {
+  border-color: var(--color-gold);
+}
+
+.booking__location-opt--selected {
+  border-color: var(--color-gold);
+  background: rgba(201, 168, 76, 0.08);
+}
+
+.booking__location-opt .loc-icon {
+  font-size: 22px;
+}
+
+.booking__location-opt .loc-label {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.booking__location-opt .loc-sub {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--color-dim);
+}
+
+.booking__location-opt--selected .loc-label {
+  color: var(--color-gold);
+}
+
+/* Mini calendar */
+.mini-cal {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.mini-cal__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mini-cal__nav-btn {
+  color: var(--color-muted);
+  display: flex;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.mini-cal__nav-btn:hover {
+  color: var(--color-text);
+}
+
+.mini-cal__month {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.mini-cal__days-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 8px 8px 4px;
+}
+
+.mini-cal__day-name {
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--color-faint);
+  padding: 4px 0;
+}
+
+.mini-cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 0 8px 12px;
+  gap: 2px 0;
+}
+
+.mini-cal__day {
+  width: 32px;
+  height: 32px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+  color: var(--color-muted);
+}
+
+.mini-cal__day:hover:not(:disabled) {
+  color: var(--color-text);
+  background: var(--color-border);
+}
+
+.mini-cal__day--selected {
+  background: var(--color-gold) !important;
+  color: var(--color-bg) !important;
+  font-weight: 600;
+}
+
+.mini-cal__day--disabled {
+  color: var(--color-darker);
+  cursor: not-allowed;
+}
+
+.booking__hint {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--color-faint);
+}
+
+/* Time chips row */
+.booking__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

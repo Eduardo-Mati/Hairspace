@@ -1,0 +1,56 @@
+/* ServicesScreen */
+.services {
+  min-height: 100vh;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.screen-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.screen-back-btn {
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.screen-back-btn:hover {
+  color: var(--color-text);
+}
+
+.screen-header__title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.screen-header__sub {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--color-dim);
+  margin-top: 2px;
+}
+
+.services__list {
+  flex: 1;
+  padding: 0 20px 112px;
+}
+
+.screen-cta {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 375px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  background: linear-gradient(to top, var(--color-bg) 60%, rgba(15,15,15,0.95) 80%, transparent 100%);
+}

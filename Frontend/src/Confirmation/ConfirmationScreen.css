@@ -1,0 +1,167 @@
+/* ConfirmationScreen */
+.confirmation {
+  min-height: 100vh;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 20px;
+}
+
+.confirmation__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+  gap: 24px;
+}
+
+/* Icon circle */
+.confirmation__icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirmation__icon--pending  { background: rgba(201,168,76,0.1); color: var(--color-gold); }
+.confirmation__icon--confirmed { background: rgba(74,222,128,0.1); color: #4ade80; }
+.confirmation__icon--rejected  { background: rgba(248,113,113,0.1); color: #f87171; }
+
+/* Texts */
+.confirmation__title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+
+.confirmation__subtitle {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.confirmation__subtitle--pending   { color: var(--color-dim); }
+.confirmation__subtitle--confirmed { color: #4ade80; }
+.confirmation__subtitle--rejected  { color: var(--color-dim); }
+
+/* Summary card */
+.confirmation__card {
+  width: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.confirmation__card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.confirmation__card-title {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--color-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.status-badge {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.status-badge--pending   { color: var(--color-gold); background: rgba(201,168,76,0.1); }
+.status-badge--confirmed { color: #4ade80; background: rgba(74,222,128,0.1); }
+.status-badge--rejected  { color: #f87171; background: rgba(248,113,113,0.1); }
+
+.confirmation__card-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.confirmation__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.confirmation__row-label {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--color-faint);
+}
+
+.confirmation__row-value {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+/* Alt suggestion */
+.confirmation__alt {
+  width: 100%;
+  background: var(--color-surface2);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.confirmation__alt-label {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--color-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 8px;
+}
+
+.confirmation__alt-date {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.confirmation__alt-accept {
+  width: 100%;
+  margin-top: 12px;
+  background: var(--color-gold);
+  color: var(--color-bg);
+  padding: 12px;
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.confirmation__alt-accept:hover  { background: var(--color-gold-h); }
+.confirmation__alt-accept:active  { transform: scale(0.98); }
+
+/* Bottom */
+.confirmation__bottom {
+  width: 100%;
+  max-width: 340px;
+  margin-top: 32px;
+}
