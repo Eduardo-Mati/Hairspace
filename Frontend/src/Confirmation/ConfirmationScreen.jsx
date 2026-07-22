@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react';
 import { Clock, CheckCircle2, AlertTriangle, Home } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { api } from '../lib/api';
 import './ConfirmationScreen.css';
 
 const MONTH_NAMES_SHORT = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
@@ -16,14 +18,42 @@ const LOCATION_LABELS = {
 };
 
 export function ConfirmationScreen() {
-  const navigate  = useNavigate();
-  const location  = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Os dados de agendamento chegam via router state (navigate('/confirmation', { state: { booking } }))
-  const booking = location.state?.booking;
+  // O id do agendamento chega via router state (navigate('/confirmation', { state: { bookingId } }))
+  const bookingId = location.state?.bookingId;
 
-  // Se alguém acessar /confirmation direto sem dados, redireciona para home
-  if (!booking) {
+  const [booking, setBooking] = useState(null);
+  const [loading, setLoading] = useState(Boolean(bookingId));
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!bookingId) return;
+
+    let active = true;
+    api.getBooking(bookingId)
+      .then((data) => { if (active) setBooking(data); })
+      .catch((err) => { if (active) setError(err.message); })
+      .finally(() => { if (active) setLoading(false); });
+
+    return () => { active = false; };
+  }, [bookingId]);
+
+  if (loading) {
+    return (
+      <div className="confirmation">
+        <div className="confirmation__body">
+          <p style={{ color: 'var(--color-dim)', fontFamily: 'var(--font-sans)' }}>
+            Carregando seu agendamento...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Sem id (acesso direto na URL) ou erro ao buscar: mesma tela de "nada encontrado" de antes.
+  if (!bookingId || error || !booking) {
     return (
       <div className="confirmation">
         <div className="confirmation__body">
@@ -36,9 +66,8 @@ export function ConfirmationScreen() {
     );
   }
 
-  // Status "pending" é o estado inicial real — a confirmação viria do backend
-  // Quando integrar com a API, substitua este valor por dados retornados do servidor
-  const status = 'pending';
+  // Status real, devolvido pelo backend: 'pending' | 'confirmed' | 'rejected'
+  const status = booking.status;
 
   const isPending   = status === 'pending';
   const isConfirmed = status === 'confirmed';
@@ -91,11 +120,11 @@ export function ConfirmationScreen() {
             </span>
           </div>
           <div className="confirmation__card-body">
-            <Row label="Nome"     value={booking.name} />
-            <Row label="Data"     value={formatDate(booking.date)} />
-            <Row label="Horário"  value={booking.time} />
+            <Row label="Nome"     value={booking.client_name} />
+            <Row label="Data"     value={formatDate(booking.booking_date)} />
+            <Row label="Horário"  value={booking.booking_time} />
             <Row label="Local"    value={LOCATION_LABELS[booking.location] || '—'} />
-            <Row label="WhatsApp" value={booking.phone} />
+            <Row label="WhatsApp" value={booking.client_phone} />
           </div>
         </div>
       </div>

@@ -1,4 +1,15 @@
 {
+  "name": "hairspace-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "db:setup": "node src/config/runSql.js db/schema.sql",
+    "db:seed": "node src/config/runSql.js db/seed.sql"
+  },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",

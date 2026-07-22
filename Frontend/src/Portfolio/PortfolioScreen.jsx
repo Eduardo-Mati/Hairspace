@@ -1,23 +1,27 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowLeft, X, MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { api } from '../lib/api';
 import './PortfolioScreen.css';
 
 const WHATSAPP_NUMBER = '5511999999999';
 
-const photos = [
-  { id: 1, src: 'https://images.unsplash.com/photo-1593702275687-f8b402bf1fb5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtZW4lMjBoYWlyY3V0JTIwZmFkZSUyMGJhcmJlcnNob3B8ZW58MXx8fHwxNzgzODg1ODQ5fDA&ixlib=rb-4.1.0&q=80&w=600', label: 'Fade degradê' },
-  { id: 2, src: 'https://images.unsplash.com/photo-1672642150228-3fcd5826ec26?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwyfHxtZW4lMjBoYWlyY3V0JTIwZmFkZSUyMGJhcmJlcnNob3B8ZW58MXx8fHwxNzgzODg1ODQ5fDA&ixlib=rb-4.1.0&q=80&w=600', label: 'Corte moderno' },
-  { id: 3, src: 'https://images.unsplash.com/photo-1589985494639-69e60c82cab2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwzfHxtZW4lMjBoYWlyY3V0JTIwZmFkZSUyMGJhcmJlcnNob3B8ZW58MXx8fHwxNzgzODg1ODQ5fDA&ixlib=rb-4.1.0&q=80&w=600', label: 'Barba + corte' },
-  { id: 4, src: 'https://images.unsplash.com/photo-1514336937476-a5b961020a5c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw0fHxtZW4lMjBoYWlyY3V0JTIwZmFkZSUyMGJhcmJlcnNob3B8ZW58MXx8fHwxNzgzODg1ODQ5fDA&ixlib=rb-4.1.0&q=80&w=600', label: 'Clássico' },
-  { id: 5, src: 'https://images.unsplash.com/photo-1593702233354-259d1f794ed1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw2fHxtZW4lMjBoYWlyY3V0JTIwZmFkZSUyMGJhcmJlcnNob3B8ZW58MXx8fHwxNzgzODg1ODQ5fDA&ixlib=rb-4.1.0&q=80&w=600', label: 'Textura alta' },
-  { id: 6, src: 'https://images.unsplash.com/photo-1759134198561-e2041049419c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwyfHxiYXJiZXJzaG9wJTIwaW50ZXJpb3IlMjBkYXJrJTIwbW9vZHl8ZW58MXx8fHwxNzgzODg1ODQ5fDA&ixlib=rb-4.1.0&q=80&w=600', label: 'Estilo vintage' },
-];
-
 export function PortfolioScreen() {
   const navigate = useNavigate();
+  const [photos, setPhotos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [selected, setSelected] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    api.getPortfolio()
+      .then((data) => { if (active) setPhotos(data); })
+      .catch((err) => { if (active) setError(err.message); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, []);
 
   const handleWhatsApp = (label) => {
     const msg = encodeURIComponent(
@@ -39,15 +43,19 @@ export function PortfolioScreen() {
       </header>
 
       <div className="portfolio__grid-wrap">
-        <div className="portfolio__grid">
-          {photos.map((photo) => (
-            <button key={photo.id} className="portfolio__photo-btn" onClick={() => setSelected(photo)}>
-              <img src={photo.src} alt={photo.label} className="portfolio__photo-img" />
-              <div className="portfolio__photo-hover" />
-              <div className="portfolio__photo-label"><p>{photo.label}</p></div>
-            </button>
-          ))}
-        </div>
+        {loading && <p className="screen-state">Carregando portfólio...</p>}
+        {!loading && error && <p className="screen-state screen-state--error">{error}</p>}
+        {!loading && !error && (
+          <div className="portfolio__grid">
+            {photos.map((photo) => (
+              <button key={photo.id} className="portfolio__photo-btn" onClick={() => setSelected(photo)}>
+                <img src={photo.image_url} alt={photo.label} className="portfolio__photo-img" />
+                <div className="portfolio__photo-hover" />
+                <div className="portfolio__photo-label"><p>{photo.label}</p></div>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Lightbox */}
@@ -61,7 +69,7 @@ export function PortfolioScreen() {
           </div>
 
           <div className="lightbox__img-wrap" onClick={(e) => e.stopPropagation()}>
-            <img src={selected.src} alt={selected.label} className="lightbox__img" />
+            <img src={selected.image_url} alt={selected.label} className="lightbox__img" />
           </div>
 
           <div className="lightbox__actions" onClick={(e) => e.stopPropagation()}>

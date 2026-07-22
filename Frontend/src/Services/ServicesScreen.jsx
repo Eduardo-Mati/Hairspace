@@ -1,20 +1,26 @@
+import { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ServiceCard } from '../components/ServiceCard';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { api } from '../lib/api';
+import { formatPrice } from '../lib/format';
 import './ServicesScreen.css';
-
-const services = [
-  { icon: '✂️', name: 'Corte Clássico', description: 'Tesoura ou máquina, acabamento perfeito com detalhes no contorno.', price: 'R$ 45', duration: '~30 min' },
-  { icon: '🪒', name: 'Barba Completa', description: 'Modelagem com navalha, toalha quente e bálsamo hidratante.', price: 'R$ 35', duration: '~25 min' },
-  { icon: '💈', name: 'Corte + Barba', description: 'O combo completo para quem quer sair renovado do salão.', price: 'R$ 70', duration: '~55 min' },
-  { icon: '🧴', name: 'Hidratação Capilar', description: 'Tratamento profundo com produtos premium para cabelos secos ou danificados.', price: 'R$ 50', duration: '~40 min' },
-  { icon: '👶', name: 'Corte Infantil', description: 'Para os pequenos (até 12 anos). Atenção especial e ambiente tranquilo.', price: 'R$ 30', duration: '~25 min' },
-  { icon: '⚡', name: 'Pigmentação de Barba', description: 'Correção de falhas e uniformização da cor da barba.', price: 'R$ 60', duration: '~45 min' },
-];
 
 export function ServicesScreen() {
   const navigate = useNavigate();
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let active = true;
+    api.getServices()
+      .then((data) => { if (active) setServices(data); })
+      .catch((err) => { if (active) setError(err.message); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, []);
 
   return (
     <div className="services">
@@ -29,8 +35,17 @@ export function ServicesScreen() {
       </header>
 
       <div className="services__list">
-        {services.map((s) => (
-          <ServiceCard key={s.name} {...s} />
+        {loading && <p className="screen-state">Carregando serviços...</p>}
+        {!loading && error && <p className="screen-state screen-state--error">{error}</p>}
+        {!loading && !error && services.map((s) => (
+          <ServiceCard
+            key={s.id}
+            icon={s.icon}
+            name={s.name}
+            description={s.description}
+            price={formatPrice(s.price_cents)}
+            duration={`~${s.duration_minutes} min`}
+          />
         ))}
       </div>
 

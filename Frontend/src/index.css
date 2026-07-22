@@ -51,3 +51,16 @@ button {
 input {
   font-family: inherit;
 }
+
+/* Estado compartilhado de carregamento/erro nas telas que buscam dados da API */
+.screen-state {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--color-dim);
+  padding: 24px 4px;
+  text-align: center;
+}
+
+.screen-state--error {
+  color: #d97575;
+}

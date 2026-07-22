@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowLeft, User, Phone, Calendar, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { TimeChip } from '../components/TimeChip';
+import { api } from '../lib/api';
 import './BookingScreen.css';
 
 const TIME_SLOTS = ['09h', '10h', '11h', '14h', '15h', '16h', '17h'];
@@ -95,16 +96,51 @@ export function BookingScreen() {
   const [time,     setTime]     = useState('');
   const [location, setLocation] = useState(''); // 'barbershop' | 'home'
 
+  const [availableSlots, setAvailableSlots] = useState(TIME_SLOTS);
+  const [slotsLoading, setSlotsLoading] = useState(false);
+
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+
   const isValid = name.trim() && phone.trim() && date && time && location;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!isValid) return;
+  // Sempre que a data muda, busca no backend quais horários já estão ocupados.
+  useEffect(() => {
+    if (!date) {
+      setAvailableSlots(TIME_SLOTS);
+      return;
+    }
 
-    // Navega para confirmação passando os dados via router state
-    navigate('/confirmation', {
-      state: { booking: { name, phone, date, time, location } },
-    });
+    let active = true;
+    setSlotsLoading(true);
+    api.getAvailableSlots(date)
+      .then((data) => {
+        if (!active) return;
+        setAvailableSlots(data.available);
+        // Se o horário escolhido deixou de estar disponível (outra pessoa reservou), limpa a seleção.
+        if (time && !data.available.includes(time)) setTime('');
+      })
+      .catch(() => { if (active) setAvailableSlots(TIME_SLOTS); })
+      .finally(() => { if (active) setSlotsLoading(false); });
+
+    return () => { active = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [date]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!isValid || submitting) return;
+
+    setSubmitting(true);
+    setSubmitError('');
+    try {
+      const booking = await api.createBooking({ name, phone, date, time, location });
+      navigate('/confirmation', { state: { bookingId: booking.id } });
+    } catch (err) {
+      setSubmitError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -189,16 +225,25 @@ export function BookingScreen() {
         <div className="booking__field">
           <label className="booking__label">Horário</label>
           <div className="booking__chips">
-            {TIME_SLOTS.map(slot => (
-              <TimeChip key={slot} time={slot} selected={time === slot} onSelect={setTime} />
+            {slotsLoading && <p className="screen-state">Verificando horários...</p>}
+            {!slotsLoading && TIME_SLOTS.map(slot => (
+              <TimeChip
+                key={slot}
+                time={slot}
+                selected={time === slot}
+                disabled={!availableSlots.includes(slot)}
+                onSelect={setTime}
+              />
             ))}
           </div>
         </div>
+
+        {submitError && <p className="screen-state screen-state--error">{submitError}</p>}
       </form>
 
       <div className="screen-cta">
-        <PrimaryButton fullWidth disabled={!isValid} onClick={handleSubmit}>
-          Solicitar Reserva
+        <PrimaryButton fullWidth disabled={!isValid || submitting} onClick={handleSubmit}>
+          {submitting ? 'Enviando...' : 'Solicitar Reserva'}
         </PrimaryButton>
       </div>
     </div>
