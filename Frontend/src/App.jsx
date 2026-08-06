@@ -5,12 +5,14 @@ import { PortfolioScreen }    from './Portfolio/PortfolioScreen';
 import { ProductsScreen }     from './Products/ProductsScreen';
 import { BookingScreen }      from './Booking/BookingScreen';
 import { ConfirmationScreen } from './Confirmation/ConfirmationScreen';
+import { LoginScreen }        from './Authentication/Login';
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/"             element={<HomeScreen />} />
+        <Route path="/login"        element={<LoginScreen />} />
         <Route path="/services"     element={<ServicesScreen />} />
         <Route path="/portfolio"    element={<PortfolioScreen />} />
         <Route path="/products"     element={<ProductsScreen />} />

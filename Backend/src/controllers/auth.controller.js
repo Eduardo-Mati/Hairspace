@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { findUserByEmail } from "../models/users.model.js";
+import model from "../models/users.model.js";
 
 export async function login(req, res, next) {
   try {
@@ -9,7 +9,7 @@ export async function login(req, res, next) {
       return res.status(400).json({ message: "Informe email e senha." });
     }
 
-    const user = await findUserByEmail(email);
+    const user = await model.findUserByEmail(email);
     if (!user) {
       return res.status(401).json({ message: "Credenciais inválidas." });
     }

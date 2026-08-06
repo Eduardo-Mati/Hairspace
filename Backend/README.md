@@ -16,7 +16,7 @@ Fluxo de uma requisição, por exemplo `GET /services`:
 
 `index.js` → `services.routes.js` → `services.controller.js` (chama o model) → `services.model.js` (faz o SELECT) → volta pro controller → `res.json(...)`.
 
-Nenhum router chama o banco diretamente, e nenhum model sabe nada sobre req/res do Express — cada camada só conhece a camada logo abaixo dela.
+Nenhum router chama o banco diretamente, e nenhum model sabe nada sobre req/res do Express, cada camada só conhece a camada logo abaixo dela.
 
 ## Setup
 
@@ -40,4 +40,4 @@ Nenhum router chama o banco diretamente, e nenhum model sabe nada sobre req/res 
 | PATCH  | /bookings/:id/status    | sim  | Confirma ou recusa um agendamento             |
 | POST   | /auth/login             | não  | Login do barbeiro/admin, devolve um JWT       |
 
-Login de exemplo criado pelo seed: `admin@hairspace.com` / `troque-esta-senha` — troque antes de ir pra produção.
+Login de exemplo criado pelo seed: `admin@hairspace.com` / `troque-esta-senha`,  troque antes de ir pra produção.

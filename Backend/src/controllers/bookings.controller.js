@@ -1,10 +1,4 @@
-import {
-  createBooking,
-  findBookingById,
-  findAllBookings,
-  updateBookingStatus,
-  findTakenSlotsByDate,
-} from "../models/bookings.model.js";
+import model from "../models/bookings.model.js";
 
 // Mesmos horários que o front oferece — se um dia isso vier do banco
 // (ex: tabela de "expediente"), só essa constante muda.
@@ -28,12 +22,12 @@ export async function postBooking(req, res, next) {
       return res.status(400).json({ message: "Horário inválido." });
     }
 
-    const taken = await findTakenSlotsByDate(date);
+    const taken = await model.findTakenSlotsByDate(date);
     if (taken.includes(time)) {
       return res.status(409).json({ message: "Esse horário acabou de ser reservado por outra pessoa." });
     }
 
-    const booking = await createBooking({ name: name.trim(), phone: phone.trim(), date, time, location });
+    const booking = await model.createBooking({ name: name.trim(), phone: phone.trim(), date, time, location });
     res.status(201).json(booking);
   } catch (err) {
     // Se dois clientes confirmarem no mesmo milissegundo, a constraint
@@ -52,7 +46,7 @@ export async function getAvailableSlots(req, res, next) {
       return res.status(400).json({ message: "Informe a data no formato AAAA-MM-DD (?date=)." });
     }
 
-    const taken = await findTakenSlotsByDate(date);
+    const taken = await model.findTakenSlotsByDate(date);
     const available = TIME_SLOTS.filter((slot) => !taken.includes(slot));
     res.json({ date, available, taken });
   } catch (err) {
@@ -62,7 +56,7 @@ export async function getAvailableSlots(req, res, next) {
 
 export async function getBooking(req, res, next) {
   try {
-    const booking = await findBookingById(req.params.id);
+    const booking = await model.findBookingById(req.params.id);
     if (!booking) {
       return res.status(404).json({ message: "Agendamento não encontrado." });
     }

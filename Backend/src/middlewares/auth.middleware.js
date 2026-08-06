@@ -1,16 +1,17 @@
 import jwt from "jsonwebtoken";
 
 export function requireAuth(req, res, next) {
-  const header = req.headers.authorization;
-  if (!header?.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Token não informado." });
-  }
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
 
-  const token = header.split(" ")[1];
+  if (!token) {
+    return res.status(401).send("Access Denied");
+  }
   try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = verified;
     next();
-  } catch {
-    return res.status(401).json({ message: "Token inválido ou expirado." });
+  } catch (err) {
+    res.status(400).send("Invalid Token");
   }
 }

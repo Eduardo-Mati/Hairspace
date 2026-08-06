@@ -40,9 +40,6 @@ export function HomeScreen() {
           <span className="home__logo-icon"><Scissors size={18} /></span>
           <span className="home__logo-text">Hairspace</span>
         </div>
-        <button className="home__menu-btn">
-          <Menu size={22} />
-        </button>
       </header>
 
       <div className="home__hero">
@@ -52,10 +49,7 @@ export function HomeScreen() {
           className="home__hero-img"
         />
         <div className="home__hero-overlay" />
-        <div className="home__hero-badge">
-          <div className="home__hero-line" />
-          <span className="home__hero-since">Desde 2018</span>
-        </div>
+        
       </div>
 
       <div className="home__about">
