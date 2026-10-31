@@ -6,6 +6,7 @@ const SELECT_FIELDS = `
   id,
   client_name,
   client_phone,
+  confirmation_code,
   to_char(booking_date, 'YYYY-MM-DD') AS booking_date,
   booking_time,
   location,
@@ -17,12 +18,13 @@ const SELECT_FIELDS = `
 const model = {
   async createBooking(bookingData) {
     const { rows } = await pool.query(
-      `INSERT INTO bookings (client_name, client_phone, booking_date, booking_time, location, status)
-       VALUES ($1, $2, $3, $4, $5, 'pending')
+      `INSERT INTO bookings (client_name, client_phone, confirmation_code, booking_date, booking_time, location, status)
+       VALUES ($1, $2, $3, $4, $5, $6, 'pending')
        RETURNING ${SELECT_FIELDS}`,
       [
         bookingData.name,
         bookingData.phone,
+        bookingData.confirmationCode,
         bookingData.date,
         bookingData.time,
         bookingData.location,
@@ -30,10 +32,10 @@ const model = {
     );
     return rows[0];
   },
-  async findBookingById(id) {
+  async findBookingById(id, confirmationCode) {
     const { rows } = await pool.query(
-      `SELECT ${SELECT_FIELDS} FROM bookings WHERE id = $1`,
-      [id]
+      `SELECT ${SELECT_FIELDS} FROM bookings WHERE id = $1 AND confirmation_code = $2`,
+      [id, confirmationCode]
     );
     return rows[0] || null;
   },

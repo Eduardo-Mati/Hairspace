@@ -23,22 +23,23 @@ export function ConfirmationScreen() {
 
   // O id do agendamento chega via router state (navigate('/confirmation', { state: { bookingId } }))
   const bookingId = location.state?.bookingId;
+  const confirmationCode = location.state?.confirmationCode;
 
   const [booking, setBooking] = useState(null);
-  const [loading, setLoading] = useState(Boolean(bookingId));
+  const [loading, setLoading] = useState(Boolean(bookingId && confirmationCode));
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!bookingId) return;
+    if (!bookingId || !confirmationCode) return;
 
     let active = true;
-    api.getBooking(bookingId)
+    api.getBooking(bookingId, confirmationCode)
       .then((data) => { if (active) setBooking(data); })
       .catch((err) => { if (active) setError(err.message); })
       .finally(() => { if (active) setLoading(false); });
 
     return () => { active = false; };
-  }, [bookingId]);
+  }, [bookingId, confirmationCode]);
 
   if (loading) {
     return (

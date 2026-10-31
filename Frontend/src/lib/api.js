@@ -16,6 +16,8 @@ async function request(path, options = {}) {
 }
 
 export const api = {
+  login: (credentials) =>
+    request('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
   getServices: () => request('/services'),
   getPortfolio: () => request('/portfolio'),
   getProducts: () => request('/products'),
@@ -23,5 +25,5 @@ export const api = {
   getAvailableSlots: (date) => request(`/bookings/available?date=${date}`),
   createBooking: (booking) =>
     request('/bookings', { method: 'POST', body: JSON.stringify(booking) }),
-  getBooking: (id) => request(`/bookings/${id}`),
+  getBooking: (id, code) => request(`/bookings/${id}?code=${encodeURIComponent(code)}`),
 };

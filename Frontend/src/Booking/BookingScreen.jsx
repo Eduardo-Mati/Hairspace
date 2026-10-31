@@ -135,7 +135,9 @@ export function BookingScreen() {
     setSubmitError('');
     try {
       const booking = await api.createBooking({ name, phone, date, time, location });
-      navigate('/confirmation', { state: { bookingId: booking.id } });
+      navigate('/confirmation', {
+        state: { bookingId: booking.id, confirmationCode: booking.confirmation_code },
+      });
     } catch (err) {
       setSubmitError(err.message);
     } finally {

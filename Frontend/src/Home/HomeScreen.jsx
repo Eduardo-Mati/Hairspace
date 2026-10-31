@@ -1,4 +1,4 @@
-import { Scissors, Menu, ChevronRight } from 'lucide-react';
+import { Scissors, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { PrimaryButton } from '../components/PrimaryButton';
 import './HomeScreen.css';

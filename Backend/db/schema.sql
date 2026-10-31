@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS bookings (
   id SERIAL PRIMARY KEY,
   client_name VARCHAR(120) NOT NULL,
   client_phone VARCHAR(30) NOT NULL,
+  confirmation_code VARCHAR(12) UNIQUE,
   booking_date DATE NOT NULL,
   booking_time VARCHAR(10) NOT NULL,
   location VARCHAR(20) NOT NULL CHECK (location IN ('barbershop', 'home')),
@@ -50,5 +51,8 @@ CREATE TABLE IF NOT EXISTS bookings (
   -- além da checagem que o controller já faz antes do INSERT.
   UNIQUE (booking_date, booking_time)
 );
+
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS confirmation_code VARCHAR(12);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_bookings_confirmation_code ON bookings (confirmation_code);
 
 CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings (booking_date);

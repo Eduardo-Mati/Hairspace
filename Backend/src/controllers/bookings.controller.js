@@ -1,4 +1,5 @@
 import model from "../models/bookings.model.js";
+import crypto from "node:crypto";
 
 // Mesmos horários que o front oferece — se um dia isso vier do banco
 // (ex: tabela de "expediente"), só essa constante muda.
@@ -15,6 +16,26 @@ export async function postBooking(req, res, next) {
         .status(400)
         .json({ message: "Preencha nome, telefone, data, horário e local." });
     }
+    const dateParts = /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/.exec(date);
+    const requestedDate = dateParts
+      ? new Date(Number(dateParts[1]), Number(dateParts[2]) - 1, Number(dateParts[3]))
+      : null;
+    const isValidDate = requestedDate
+      && requestedDate.getFullYear() === Number(dateParts[1])
+      && requestedDate.getMonth() === Number(dateParts[2]) - 1
+      && requestedDate.getDate() === Number(dateParts[3]);
+    if (!isValidDate) {
+      return res.status(400).json({ message: "Data inválida. Use o formato AAAA-MM-DD." });
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (requestedDate < today) {
+      return res.status(400).json({ message: "Não é possível agendar para uma data passada." });
+    }
+    if (requestedDate.getDay() === 0) {
+      return res.status(400).json({ message: "Não é possível agendar aos domingos." });
+    }
     if (!VALID_LOCATIONS.includes(location)) {
       return res.status(400).json({ message: "Local de atendimento inválido." });
     }
@@ -27,7 +48,15 @@ export async function postBooking(req, res, next) {
       return res.status(409).json({ message: "Esse horário acabou de ser reservado por outra pessoa." });
     }
 
-    const booking = await model.createBooking({ name: name.trim(), phone: phone.trim(), date, time, location });
+    const confirmationCode = crypto.randomBytes(4).toString("hex");
+    const booking = await model.createBooking({
+      name: name.trim(),
+      phone: phone.trim(),
+      confirmationCode,
+      date,
+      time,
+      location,
+    });
     res.status(201).json(booking);
   } catch (err) {
     // Se dois clientes confirmarem no mesmo milissegundo, a constraint
@@ -56,7 +85,7 @@ export async function getAvailableSlots(req, res, next) {
 
 export async function getBooking(req, res, next) {
   try {
-    const booking = await model.findBookingById(req.params.id);
+    const booking = await model.findBookingById(req.params.id, req.query.code);
     if (!booking) {
       return res.status(404).json({ message: "Agendamento não encontrado." });
     }
@@ -69,7 +98,7 @@ export async function getBooking(req, res, next) {
 // Rota autenticada (painel do barbeiro)
 export async function listBookings(req, res, next) {
   try {
-    const bookings = await findAllBookings();
+    const bookings = await model.findAllBookings();
     res.json(bookings);
   } catch (err) {
     next(err);
@@ -84,7 +113,7 @@ export async function patchBookingStatus(req, res, next) {
       return res.status(400).json({ message: "Status inválido." });
     }
 
-    const booking = await updateBookingStatus(req.params.id, status);
+    const booking = await model.updateBookingStatus(req.params.id, status);
     if (!booking) {
       return res.status(404).json({ message: "Agendamento não encontrado." });
     }

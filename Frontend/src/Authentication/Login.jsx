@@ -1,22 +1,22 @@
-import useState from 'react';
+import { useState } from 'react';
+import { api } from '../lib/api';
 
 export function LoginScreen() {
 
     const [senha, setSenha] = useState('');
     const [email, setEmail] = useState('');
+    // [ASSUNÇÃO] O token fica temporariamente no estado local até a Fase 2 definir a sessão.
+    const [token, setToken] = useState('');
+    const [error, setError] = useState('');
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setError('');
         try {
-            const response = await fetch('http://localhost:5173/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password: senha })
-            });
-            const data = await response.json();
-            console.log(data);
+            const data = await api.login({ email, password: senha });
+            setToken(data.token);
         } catch (error) {
-            console.error('Error during login:', error);
+            setError(error.message);
         }
     };
 
@@ -28,6 +28,8 @@ export function LoginScreen() {
             <input value={senha} onChange={(e) => setSenha(e.target.value)} type="password" placeholder="Password" />
             <button type="submit">Login</button>
         </form>
+        {error && <p role="alert">{error}</p>}
+        {token && <p role="status">Login realizado com sucesso.</p>}
         </div>
     );
 }
