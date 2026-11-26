@@ -18,6 +18,10 @@ em `index.js`, valida entradas nos controllers e concentra SQL nos models.
 - `src/models/` executa queries via o pool compartilhado.
 - `src/middlewares/` contém autenticação JWT e tratamento de erros.
 - `db/schema.sql` e `db/seed.sql` são a fonte do schema e dos dados locais.
+- Cada barbearia tem um admin; serviços e reservas pertencem a uma barbearia,
+  enquanto produtos e fotos do portfólio continuam globais.
+- O banco restringe a reserva por barbearia/data/horário e garante que o
+  serviço da reserva pertença à mesma barbearia.
 
 Rotas públicas incluem catálogo e criação/consulta de agendamento. Listagem e
 alteração de status de agendamentos exigem JWT.

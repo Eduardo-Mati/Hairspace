@@ -1,33 +1,49 @@
--- Hairspace — schema inicial (PostgreSQL)
--- Rodar com: npm run db:setup
+-- Hairspace multi-barbearias
 
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   name VARCHAR(120) NOT NULL,
-  email VARCHAR(160) UNIQUE NOT NULL,
+  email VARCHAR(160) NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
-  role VARCHAR(20) NOT NULL DEFAULT 'barber',
+  role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'client')),
   created_at TIMESTAMP NOT NULL DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS services (
+CREATE TABLE barbershops (
   id SERIAL PRIMARY KEY,
+  owner_id INTEGER NOT NULL UNIQUE REFERENCES users(id),
+  name VARCHAR(120) NOT NULL,
+  address TEXT NOT NULL,
+  latitude NUMERIC(9, 6) NOT NULL,
+  longitude NUMERIC(9, 6) NOT NULL,
+  primary_color VARCHAR(7) NOT NULL
+    CHECK (primary_color ~ '^#[0-9a-fA-F]{6}$'),
+  accent_color VARCHAR(7) NOT NULL
+    CHECK (accent_color ~ '^#[0-9a-fA-F]{6}$'),
+  active BOOLEAN NOT NULL DEFAULT true
+);
+
+CREATE TABLE services (
+  id SERIAL PRIMARY KEY,
+  barbershop_id INTEGER NOT NULL REFERENCES barbershops(id),
   icon VARCHAR(10),
   name VARCHAR(120) NOT NULL,
   description TEXT,
   price_cents INTEGER NOT NULL,
   duration_minutes INTEGER NOT NULL,
-  active BOOLEAN NOT NULL DEFAULT true
+  active BOOLEAN NOT NULL DEFAULT true,
+  UNIQUE (id, barbershop_id),
+  UNIQUE (barbershop_id, name)
 );
 
-CREATE TABLE IF NOT EXISTS portfolio_photos (
+CREATE TABLE portfolio_photos (
   id SERIAL PRIMARY KEY,
   image_url TEXT NOT NULL,
   label VARCHAR(120) NOT NULL,
   sort_order INTEGER NOT NULL DEFAULT 0
 );
 
-CREATE TABLE IF NOT EXISTS products (
+CREATE TABLE products (
   id SERIAL PRIMARY KEY,
   image_url TEXT NOT NULL,
   name VARCHAR(120) NOT NULL,
@@ -36,23 +52,28 @@ CREATE TABLE IF NOT EXISTS products (
   active BOOLEAN NOT NULL DEFAULT true
 );
 
-CREATE TABLE IF NOT EXISTS bookings (
+CREATE TABLE bookings (
   id SERIAL PRIMARY KEY,
+  barbershop_id INTEGER NOT NULL REFERENCES barbershops(id),
+  service_id INTEGER NOT NULL,
   client_name VARCHAR(120) NOT NULL,
   client_phone VARCHAR(30) NOT NULL,
   confirmation_code VARCHAR(12) UNIQUE,
   booking_date DATE NOT NULL,
   booking_time VARCHAR(10) NOT NULL,
   location VARCHAR(20) NOT NULL CHECK (location IN ('barbershop', 'home')),
-  status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'rejected')),
+  status VARCHAR(20) NOT NULL DEFAULT 'pending'
+    CHECK (status IN ('pending', 'confirmed', 'rejected')),
   created_at TIMESTAMP NOT NULL DEFAULT now(),
   updated_at TIMESTAMP NOT NULL DEFAULT now(),
-  -- Trava no próprio banco contra dois agendamentos no mesmo horário,
-  -- além da checagem que o controller já faz antes do INSERT.
-  UNIQUE (booking_date, booking_time)
+  FOREIGN KEY (service_id, barbershop_id)
+    REFERENCES services (id, barbershop_id),
+  UNIQUE (barbershop_id, booking_date, booking_time)
 );
 
-ALTER TABLE bookings ADD COLUMN IF NOT EXISTS confirmation_code VARCHAR(12);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_bookings_confirmation_code ON bookings (confirmation_code);
-
-CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings (booking_date);
+CREATE INDEX idx_barbershops_active ON barbershops (active);
+CREATE INDEX idx_services_barbershop_active
+  ON services (barbershop_id, active);
+CREATE INDEX idx_bookings_barbershop_date
+  ON bookings (barbershop_id, booking_date);
+CREATE INDEX idx_bookings_date ON bookings (booking_date);

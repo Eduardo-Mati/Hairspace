@@ -8,17 +8,19 @@
 
 ## Instalação
 
-1. No backend, copie `.env.example` para `.env` e preencha uma conexão de
-   desenvolvimento. Nunca versione o `.env`.
+1. No backend, copie `.env.example` para `.env` e configure `DATABASE_URL` para
+   um PostgreSQL local. Nunca versione o `.env`.
 2. Instale e inicialize o banco:
 
    ```powershell
    Push-Location Backend
    npm install
-   npm run db:setup
-   npm run db:seed
+   npm run db:reset
    Pop-Location
    ```
+
+   `db:reset` apaga e recria o schema `public`, aplica o seed e recusa URLs que
+   não apontem para localhost. Use somente um banco local descartável.
 
 3. Em um terminal, execute `Push-Location Backend; npm run dev`.
 4. Em outro terminal, execute `Push-Location Frontend; npm install; npm run dev`.

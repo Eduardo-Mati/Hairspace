@@ -9,7 +9,7 @@ src/controllers/*.js    → recebe req, valida entrada, chama o model, monta a r
 src/models/*.model.js   → toda query SQL fica aqui (usa o pool do src/config/db.js)
 src/middlewares/*.js    → auth (JWT) e tratamento de erro central
 db/schema.sql           → cria as tabelas
-db/seed.sql             → popula com os mesmos dados que hoje estão fixos no front
+db/seed.sql             → popula cinco barbearias fictícias, serviços e catálogo
 ```
 
 Fluxo de uma requisição, por exemplo `GET /services`:
@@ -20,11 +20,15 @@ Nenhum router chama o banco diretamente, e nenhum model sabe nada sobre req/res 
 
 ## Setup
 
-1. Copie `.env.example` para `.env` e preencha `DATABASE_URL` com a string de conexão do seu Postgres (local, Supabase, Neon, etc).
+1. Copie `.env.example` para `.env` e configure `DATABASE_URL` para um PostgreSQL local.
 2. Instale as dependências: `npm install`
-3. Crie as tabelas: `npm run db:setup`
-4. Popule com dados de exemplo: `npm run db:seed`
-5. Suba o servidor: `npm run dev` (reinicia sozinho a cada alteração) ou `npm start`
+3. Inicialize o banco de desenvolvimento: `npm run db:reset`
+4. Suba o servidor: `npm run dev` (reinicia sozinho a cada alteração) ou `npm start`
+
+`npm run db:reset` apaga e recria o schema `public` e executa o seed. O comando
+recusa qualquer `DATABASE_URL` que não aponte para localhost; use apenas um
+banco local descartável. `npm run db:setup` e `npm run db:seed` continuam
+disponíveis para execução manual.
 
 ## Endpoints
 
@@ -40,4 +44,15 @@ Nenhum router chama o banco diretamente, e nenhum model sabe nada sobre req/res 
 | PATCH  | /bookings/:id/status    | sim  | Confirma ou recusa um agendamento             |
 | POST   | /auth/login             | não  | Login do barbeiro/admin, devolve um JWT       |
 
-Login de exemplo criado pelo seed: `admin@hairspace.com` / `troque-esta-senha`,  troque antes de ir pra produção.
+### Credenciais do seed — desenvolvimento somente
+
+| Barbearia | E-mail |
+|---|---|
+| Barbearia Horizonte | `admin.horizonte@hairspace.test` |
+| Navalha Fina | `admin.navalha@hairspace.test` |
+| Ponto e Corte | `admin.pontoecorte@hairspace.test` |
+| Casa do Barbeiro | `admin.casa@hairspace.test` |
+| Oficina da Barba | `admin.oficina@hairspace.test` |
+
+Senha compartilhada: `HairspaceDevOnly2026!`. Essas credenciais servem somente
+para desenvolvimento local; nunca as use em produção.

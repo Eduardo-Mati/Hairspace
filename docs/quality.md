@@ -6,7 +6,7 @@
 |---|---|
 | `Push-Location Frontend; npm run lint; npm run build; Pop-Location` | Regras Oxlint e bundle de produção |
 | `Push-Location Backend; node --check index.js; Get-ChildItem src -Recurse -Filter *.js \| ForEach-Object { node --check $_.FullName }; Pop-Location` | Sintaxe de todos os módulos JS |
-| `Push-Location Backend; npm run db:setup; npm run db:seed; Pop-Location` | Schema e dados em PostgreSQL autorizado |
+| `Push-Location Backend; npm run db:reset; Pop-Location` | Recria schema e seed; o comando só aceita `DATABASE_URL` de localhost |
 | `npm audit --omit=dev --audit-level=high` em cada aplicação | Vulnerabilidades de dependências de produção |
 
 Não há suíte de testes automatizados, typecheck ou CI versionados no estado

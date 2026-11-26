@@ -2,4 +2,5 @@
 
 | Data | Ferramenta | Pedido | Gerado | Correções ou validações do usuário |
 |---|---|---|---|---|
-| 2026-11-26 | Copilot SDK em VS Code | Higienizar o repositório para o MVP multi-barbearias (Etapa 0). | Retirada de `Backend/node_modules` do índice, remoção dos arquivos Register vazios e verificações de higiene. | Pendente de revisão e aceite do usuário. |
+| 2026-11-26 | Copilot SDK em VS Code | Higienizar o repositório para o MVP multi-barbearias (Etapa 0). | Retirada de `Backend/node_modules` do índice, remoção dos arquivos Register vazios e verificações de higiene. | Lint, build, sintaxe e worktree limpo validados; usuário aprovou seguir para a Etapa 1 sem correções solicitadas. |
+| 2026-11-26 | Copilot SDK em VS Code | Preparar banco multi-barbearias (Etapa 1). | Schema, seed fictício com cinco barbearias e `db:reset` protegido para localhost; instruções de banco atualizadas. | Reset local, bloqueio de URL não local, hashes bcrypt, unicidade de reserva, isolamento do serviço e CHECK de cor validados; revisão/aceite do usuário pendente. |
