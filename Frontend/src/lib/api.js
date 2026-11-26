@@ -18,11 +18,19 @@ async function request(path, options = {}) {
 export const api = {
   login: (credentials) =>
     request('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
+  getBarbershops: () => request('/barbershops'),
+  getBarbershop: (id) => request(`/barbershops/${encodeURIComponent(id)}`),
   getServices: () => request('/services'),
   getPortfolio: () => request('/portfolio'),
   getProducts: () => request('/products'),
 
-  getAvailableSlots: (date) => request(`/bookings/available?date=${date}`),
+  getAvailableSlots: (barbershopId, date) => {
+    const query = new URLSearchParams({
+      barbershop_id: String(barbershopId),
+      date,
+    });
+    return request(`/bookings/available?${query}`);
+  },
   createBooking: (booking) =>
     request('/bookings', { method: 'POST', body: JSON.stringify(booking) }),
   getBooking: (id, code) => request(`/bookings/${id}?code=${encodeURIComponent(code)}`),

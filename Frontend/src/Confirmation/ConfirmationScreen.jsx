@@ -3,6 +3,7 @@ import { Clock, CheckCircle2, AlertTriangle, Home } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { api } from '../lib/api';
+import { getBarbershopTheme } from '../lib/barbershopTheme';
 import './ConfirmationScreen.css';
 
 const MONTH_NAMES_SHORT = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
@@ -73,9 +74,10 @@ export function ConfirmationScreen() {
   const isPending   = status === 'pending';
   const isConfirmed = status === 'confirmed';
   const isRejected  = status === 'rejected';
+  const theme = getBarbershopTheme(booking);
 
   return (
-    <div className="confirmation">
+    <div className="confirmation barbershop-theme" style={theme}>
       <div className="confirmation__body">
         {/* Ícone de status */}
         <div className={`confirmation__icon confirmation__icon--${status}`}>
@@ -121,6 +123,8 @@ export function ConfirmationScreen() {
             </span>
           </div>
           <div className="confirmation__card-body">
+            <Row label="Barbearia" value={booking.barbershop_name} />
+            <Row label="Serviço"   value={booking.service_name} />
             <Row label="Nome"     value={booking.client_name} />
             <Row label="Data"     value={formatDate(booking.booking_date)} />
             <Row label="Horário"  value={booking.booking_time} />

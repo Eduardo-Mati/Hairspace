@@ -1,93 +1,123 @@
-import { Scissors, ChevronRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Scissors } from 'lucide-react';
+import L from 'leaflet';
+import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
-import { PrimaryButton } from '../components/PrimaryButton';
+import { api } from '../lib/api';
+import 'leaflet/dist/leaflet.css';
 import './HomeScreen.css';
 
-const navCards = [
-  {
-    id: 'services',
-    path: '/services',
-    label: 'Serviços',
-    sub: 'Cortes, barba & mais',
-    icon: '✂️',
-    bg: 'https://images.unsplash.com/photo-1593702275687-f8b402bf1fb5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtZW4lMjBoYWlyY3V0JTIwZmFkZSUyMGJhcmJlcnNob3B8ZW58MXx8fHwxNzgzODg1ODQ5fDA&ixlib=rb-4.1.0&q=80&w=400',
-  },
-  {
-    id: 'portfolio',
-    path: '/portfolio',
-    label: 'Cortes',
-    sub: 'Nosso portfólio',
-    icon: '📷',
-    bg: 'https://images.unsplash.com/photo-1672642150228-3fcd5826ec26?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwyfHxtZW4lMjBoYWlyY3V0JTIwZmFkZSUyMGJhcmJlcnNob3B8ZW58MXx8fHwxNzgzODg1ODQ5fDA&ixlib=rb-4.1.0&q=80&w=400',
-  },
-  {
-    id: 'products',
-    path: '/products',
-    label: 'Produtos',
-    sub: 'Linha de cuidados',
-    icon: '🧴',
-    bg: 'https://images.unsplash.com/photo-1647140656295-61486627df99?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwyfHxoYWlyJTIwZ3Jvb21pbmclMjBwcm9kdWN0cyUyMHBvbWFkZSUyMGJlYXJkfGVufDF8fHx8MTc4Mzg4NTg1MHww&ixlib=rb-4.1.0&q=80&w=400',
-  },
-];
+const DEFAULT_CENTER = [-25.43, -49.27];
+
+const barbershopIcon = L.divIcon({
+  className: 'barbershop-marker',
+  html: '<span aria-hidden="true">💈</span>',
+  iconSize: [40, 40],
+  iconAnchor: [20, 38],
+  popupAnchor: [0, -34],
+});
+
+function FitBarbershops({ barbershops }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (barbershops.length === 0) return;
+
+    const bounds = L.latLngBounds(
+      barbershops.map((shop) => [Number(shop.latitude), Number(shop.longitude)])
+    );
+    if (barbershops.length === 1) {
+      map.setView(bounds.getCenter(), 14);
+    } else {
+      map.fitBounds(bounds, { padding: [32, 32], maxZoom: 14 });
+    }
+  }, [barbershops, map]);
+
+  return null;
+}
 
 export function HomeScreen() {
   const navigate = useNavigate();
+  const [barbershops, setBarbershops] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let active = true;
+    api.getBarbershops()
+      .then((data) => {
+        if (active) setBarbershops(data);
+      })
+      .catch((err) => {
+        if (active) setError(err.message);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => { active = false; };
+  }, []);
 
   return (
-    <div className="home">
-      <header className="home__header">
+    <main className="home map-screen">
+      <header className="home__header map-screen__header">
         <div className="home__logo">
           <span className="home__logo-icon"><Scissors size={18} /></span>
           <span className="home__logo-text">Hairspace</span>
         </div>
+        <nav className="map-screen__nav" aria-label="Navegação principal">
+          <button type="button" onClick={() => navigate('/portfolio')}>Portfólio</button>
+          <button type="button" onClick={() => navigate('/products')}>Produtos</button>
+        </nav>
       </header>
 
-      <div className="home__hero">
-        <img
-          src="https://images.unsplash.com/photo-1781768526571-ef9c333279c7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiYXJiZXJzaG9wJTIwaW50ZXJpb3IlMjBkYXJrJTIwbW9vZHl8ZW58MXx8fHwxNzgzODg1ODQ5fDA&ixlib=rb-4.1.0&q=80&w=1080"
-          alt="Hairspace barbershop"
-          className="home__hero-img"
-        />
-        <div className="home__hero-overlay" />
-        
-      </div>
-
-      <div className="home__about">
-        <h1 className="home__title">
-          A arte do corte<br />
-          <span className="home__title-gold">perfeito.</span>
-        </h1>
-        <p className="home__desc">
-          Tradição e precisão em cada detalhe. Aqui, cada visita é uma experiência — não apenas um corte.
-        </p>
-      </div>
-
-      <div className="home__divider" />
-
-      <div className="home__cards">
-        {navCards.map((card) => (
-          <button key={card.id} className="home__card" onClick={() => navigate(card.path)}>
-            <img src={card.bg} alt={card.label} className="home__card-bg" />
-            <div className="home__card-gradient" />
-            <div className="home__card-content">
-              <div className="home__card-left">
-                <span className="home__card-emoji">{card.icon}</span>
-                <div>
-                  <p className="home__card-label">{card.label}</p>
-                  <p className="home__card-sub">{card.sub}</p>
-                </div>
-              </div>
-              <ChevronRight size={18} className="home__card-arrow" />
-            </div>
-          </button>
-        ))}
-      </div>
-
-      <div className="home__cta">
-        <PrimaryButton fullWidth onClick={() => navigate('/booking')}>
-          Agendar Horário
-        </PrimaryButton>
-      </div>
-    </div>
+      <section className="map-screen__content" aria-label="Mapa de barbearias">
+        <div className="map-screen__heading">
+          <p>Encontre seu próximo corte</p>
+          <h1>Escolha sua barbearia</h1>
+        </div>
+        <div className="map-screen__map">
+          {loading && <p className="map-screen__state">Carregando barbearias...</p>}
+          {!loading && error && (
+            <p className="map-screen__state map-screen__state--error">{error}</p>
+          )}
+          {!loading && !error && barbershops.length === 0 && (
+            <p className="map-screen__state">Nenhuma barbearia disponível.</p>
+          )}
+          <MapContainer
+            center={DEFAULT_CENTER}
+            zoom={12}
+            scrollWheelZoom
+            className="map-screen__leaflet"
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <FitBarbershops barbershops={barbershops} />
+            {barbershops.map((shop) => (
+              <Marker
+                key={shop.id}
+                position={[Number(shop.latitude), Number(shop.longitude)]}
+                icon={barbershopIcon}
+                title={shop.name}
+              >
+                <Popup>
+                  <div className="map-screen__popup">
+                    <strong>{shop.name}</strong>
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/barbershops/${shop.id}`)}
+                    >
+                      Ver barbearia
+                    </button>
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
+        </div>
+      </section>
+    </main>
   );
 }

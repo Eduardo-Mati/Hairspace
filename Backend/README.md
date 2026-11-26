@@ -41,7 +41,7 @@ disponíveis para execução manual.
 | GET | `/products` | não | Lista os produtos globais ativos |
 | GET | `/bookings/available?barbershop_id=&date=AAAA-MM-DD` | não | Retorna grade, horários livres e ocupados da barbearia |
 | POST | `/bookings` | não | Cria reserva com `barbershop_id` e `service_id` |
-| GET | `/bookings/:id?code=...` | não | Consulta uma reserva pelo código de confirmação |
+| GET | `/bookings/:id?code=...` | não | Consulta reserva, barbearia, serviço e cores pelo código |
 | POST | `/auth/login` | não | Login; retorna JWT com `id` e `role` |
 | GET | `/admin/barbershop` | admin | Consulta a barbearia vinculada ao usuário autenticado |
 | PATCH | `/admin/barbershop` | admin | Atualiza somente `name`, `primary_color` e `accent_color` |

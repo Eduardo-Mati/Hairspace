@@ -1,6 +1,6 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { HomeScreen }         from './Home/HomeScreen';
-import { ServicesScreen }     from './Services/ServicesScreen';
+import { BarbershopScreen }   from './Barbershops/BarbershopScreen';
 import { PortfolioScreen }    from './Portfolio/PortfolioScreen';
 import { ProductsScreen }     from './Products/ProductsScreen';
 import { BookingScreen }      from './Booking/BookingScreen';
@@ -13,10 +13,15 @@ export default function App() {
       <Routes>
         <Route path="/"             element={<HomeScreen />} />
         <Route path="/login"        element={<LoginScreen />} />
-        <Route path="/services"     element={<ServicesScreen />} />
+        <Route path="/barbershops/:barbershopId" element={<BarbershopScreen />} />
+        <Route
+          path="/barbershops/:barbershopId/services/:serviceId/booking"
+          element={<BookingScreen />}
+        />
+        <Route path="/services"     element={<Navigate to="/" replace />} />
+        <Route path="/booking"      element={<Navigate to="/" replace />} />
         <Route path="/portfolio"    element={<PortfolioScreen />} />
         <Route path="/products"     element={<ProductsScreen />} />
-        <Route path="/booking"      element={<BookingScreen />} />
         <Route path="/confirmation" element={<ConfirmationScreen />} />
       </Routes>
     </BrowserRouter>

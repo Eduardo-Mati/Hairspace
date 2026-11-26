@@ -6,6 +6,34 @@
   flex-direction: column;
 }
 
+.booking__context {
+  padding: 18px 20px 0;
+  color: var(--color-muted);
+}
+
+.booking__context-shop {
+  color: var(--color-gold);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.booking__context h2 {
+  margin-top: 5px;
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: 19px;
+}
+
+.booking__context > p:last-child {
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+.booking__invalid {
+  padding: 24px 20px;
+}
+
 .booking__form {
   flex: 1;
   padding: 24px 20px 112px;
@@ -86,7 +114,7 @@
 
 .booking__location-opt--selected {
   border-color: var(--color-gold);
-  background: rgba(201, 168, 76, 0.08);
+  background: color-mix(in srgb, var(--color-gold) 8%, transparent);
 }
 
 .booking__location-opt .loc-icon {

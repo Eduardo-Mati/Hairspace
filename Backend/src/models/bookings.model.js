@@ -14,7 +14,9 @@ const BOOKING_FIELDS = `
   b.created_at,
   b.updated_at,
   s.name AS service_name,
-  bs.name AS barbershop_name
+  bs.name AS barbershop_name,
+  bs.primary_color,
+  bs.accent_color
 `;
 
 const model = {
