@@ -4,18 +4,25 @@ import L from 'leaflet';
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
+import { getBarbershopTheme } from '../lib/barbershopTheme';
 import 'leaflet/dist/leaflet.css';
 import './HomeScreen.css';
 
 const DEFAULT_CENTER = [-25.43, -49.27];
 
-const barbershopIcon = L.divIcon({
-  className: 'barbershop-marker',
-  html: '<span aria-hidden="true">💈</span>',
-  iconSize: [40, 40],
-  iconAnchor: [20, 38],
-  popupAnchor: [0, -34],
-});
+function createBarbershopIcon(barbershop) {
+  const theme = getBarbershopTheme(barbershop);
+  const primary = theme['--color-gold'];
+  const accent = theme['--color-gold-h'];
+
+  return L.divIcon({
+    className: 'barbershop-marker',
+    html: `<span style="--marker-primary:${primary};--marker-accent:${accent}" aria-hidden="true">💈</span>`,
+    iconSize: [40, 40],
+    iconAnchor: [20, 38],
+    popupAnchor: [0, -34],
+  });
+}
 
 function FitBarbershops({ barbershops }) {
   const map = useMap();
@@ -68,6 +75,7 @@ export function HomeScreen() {
         <nav className="map-screen__nav" aria-label="Navegação principal">
           <button type="button" onClick={() => navigate('/portfolio')}>Portfólio</button>
           <button type="button" onClick={() => navigate('/products')}>Produtos</button>
+          <button type="button" onClick={() => navigate('/login')}>Admin</button>
         </nav>
       </header>
 
@@ -99,7 +107,7 @@ export function HomeScreen() {
               <Marker
                 key={shop.id}
                 position={[Number(shop.latitude), Number(shop.longitude)]}
-                icon={barbershopIcon}
+                icon={createBarbershopIcon(shop)}
                 title={shop.name}
               >
                 <Popup>
