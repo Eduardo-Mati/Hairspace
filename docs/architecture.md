@@ -22,6 +22,8 @@ em `index.js`, valida entradas nos controllers e concentra SQL nos models.
   enquanto produtos e fotos do portfólio continuam globais.
 - O banco restringe a reserva por barbearia/data/horário e garante que o
   serviço da reserva pertença à mesma barbearia.
+- As rotas administrativas resolvem a barbearia pelo `id` do usuário no JWT e
+  pelo `owner_id`; identificadores enviados pelo cliente não definem escopo.
 
 Rotas públicas incluem catálogo e criação/consulta de agendamento. Listagem e
 alteração de status de agendamentos exigem JWT.

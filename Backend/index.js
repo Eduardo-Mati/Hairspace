@@ -7,6 +7,8 @@ import portfolioRoutes from "./src/routes/portfolio.routes.js";
 import productsRoutes from "./src/routes/products.routes.js";
 import bookingsRoutes from "./src/routes/bookings.routes.js";
 import authRoutes from "./src/routes/auth.routes.js";
+import barbershopsRoutes from "./src/routes/barbershops.routes.js";
+import adminRoutes from "./src/routes/admin.routes.js";
 import { errorHandler } from "./src/middlewares/errorHandler.middleware.js";
 
 dotenv.config();
@@ -25,6 +27,8 @@ app.use("/portfolio", portfolioRoutes);
 app.use("/products", productsRoutes);
 app.use("/bookings", bookingsRoutes);
 app.use("/auth", authRoutes);
+app.use("/barbershops", barbershopsRoutes);
+app.use("/admin", adminRoutes);
 
 // Sempre por último: captura erros passados via next(err) em qualquer controller.
 app.use(errorHandler);

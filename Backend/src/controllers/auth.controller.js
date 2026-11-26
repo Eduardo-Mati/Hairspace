@@ -4,12 +4,12 @@ import model from "../models/users.model.js";
 
 export async function login(req, res, next) {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
+    const { email, password } = req.body ?? {};
+    if (typeof email !== "string" || !email.trim() || typeof password !== "string" || !password) {
       return res.status(400).json({ message: "Informe email e senha." });
     }
 
-    const user = await model.findUserByEmail(email);
+    const user = await model.findUserByEmail(email.trim());
     if (!user) {
       return res.status(401).json({ message: "Credenciais inválidas." });
     }
@@ -20,7 +20,7 @@ export async function login(req, res, next) {
     }
 
     const token = jwt.sign(
-      { sub: user.id, email: user.email, role: user.role },
+      { id: user.id, sub: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "8h" }
     );

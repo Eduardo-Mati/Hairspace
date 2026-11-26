@@ -32,17 +32,25 @@ disponíveis para execução manual.
 
 ## Endpoints
 
-| Método | Rota                    | Auth | Descrição                                   |
-|--------|-------------------------|------|----------------------------------------------|
-| GET    | /services               | não  | Lista os serviços ativos                      |
-| GET    | /portfolio              | não  | Lista as fotos do portfólio                   |
-| GET    | /products               | não  | Lista os produtos ativos                      |
-| GET    | /bookings/available     | não  | Horários livres numa data (`?date=AAAA-MM-DD`)|
-| POST   | /bookings               | não  | Cria uma solicitação de agendamento           |
-| GET    | /bookings/:id           | não  | Consulta um agendamento (usado na Confirmação)|
-| GET    | /bookings               | sim  | Lista todos os agendamentos (painel do barbeiro)|
-| PATCH  | /bookings/:id/status    | sim  | Confirma ou recusa um agendamento             |
-| POST   | /auth/login             | não  | Login do barbeiro/admin, devolve um JWT       |
+| Método | Rota | Auth | Descrição |
+|---|---|---|---|
+| GET | `/barbershops` | não | Lista barbearias ativas, coordenadas e cores |
+| GET | `/barbershops/:id` | não | Detalha a barbearia ativa e seus serviços ativos |
+| GET | `/services` | não | Lista serviços ativos de barbearias ativas |
+| GET | `/portfolio` | não | Lista as fotos do portfólio global |
+| GET | `/products` | não | Lista os produtos globais ativos |
+| GET | `/bookings/available?barbershop_id=&date=AAAA-MM-DD` | não | Retorna grade, horários livres e ocupados da barbearia |
+| POST | `/bookings` | não | Cria reserva com `barbershop_id` e `service_id` |
+| GET | `/bookings/:id?code=...` | não | Consulta uma reserva pelo código de confirmação |
+| POST | `/auth/login` | não | Login; retorna JWT com `id` e `role` |
+| GET | `/admin/barbershop` | admin | Consulta a barbearia vinculada ao usuário autenticado |
+| PATCH | `/admin/barbershop` | admin | Atualiza somente `name`, `primary_color` e `accent_color` |
+| GET | `/admin/bookings?date=AAAA-MM-DD` | admin | Lista as reservas da própria barbearia na data |
+| PATCH | `/admin/bookings/:id/status` | admin | Altera status somente de reserva da própria barbearia |
+
+As rotas administrativas exigem `Authorization: Bearer <token>`. Ausência ou
+invalidade do token responde 401; papel diferente de `admin` responde 403.
+Reservas de outra barbearia em uma alteração administrativa respondem 404.
 
 ### Credenciais do seed — desenvolvimento somente
 
