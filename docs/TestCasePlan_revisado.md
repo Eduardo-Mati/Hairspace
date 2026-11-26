@@ -144,7 +144,7 @@ Para cada execução, registrar data, ambiente, commit, executor, caso, status, 
 | Data | Ambiente/commit | Casos | Resultado | Evidência | Observações |
 |---|---|---|---|---|---|
 | 2026-11-16 | Desenvolvimento local | Checks estáticos e health check | Passou | Lint, build, sintaxe, audit e `/health` | Registro histórico anterior à suíte automatizada. |
-| 2026-11-26 | Windows, branch `etapa-5-testes` | TC-023 a TC-030 e checks automatizados | Aprovado | `npm test`: 6/6; `db:reset`; lint, build, `node --check` e audits sem vulnerabilidades altas | PostgreSQL 17 temporário, local e UTF-8; cluster e dados descartáveis removidos. Teste detectou e corrigiu resposta desatualizada no PATCH de status. |
+| 2026-11-26 | Windows, commit `bfe2aa4` | TC-023 a TC-030 e checks automatizados | Aprovado | `npm test`: 6/6; `db:reset`; lint, build, `node --check` e audits sem vulnerabilidades altas | PostgreSQL 17 temporário, local e UTF-8; cluster e dados descartáveis removidos. Teste detectou e corrigiu resposta desatualizada no PATCH de status. |
 
 **Status sugeridos:** Não executado, Aprovado, Reprovado, Bloqueado ou Não aplicável.
 
