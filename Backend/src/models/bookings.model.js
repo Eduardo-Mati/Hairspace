@@ -1,27 +1,38 @@
 import { pool } from "../config/db.js";
-// to_char garante que a data volte como texto "AAAA-MM-DD" (o formato que
-// o front já usa), em vez do objeto Date que o driver "pg" devolveria
-// por padrão para colunas DATE.
-const SELECT_FIELDS = `
-  id,
-  client_name,
-  client_phone,
-  confirmation_code,
-  to_char(booking_date, 'YYYY-MM-DD') AS booking_date,
-  booking_time,
-  location,
-  status,
-  created_at,
-  updated_at
+
+const BOOKING_FIELDS = `
+  b.id,
+  b.barbershop_id,
+  b.service_id,
+  b.client_name,
+  b.client_phone,
+  b.confirmation_code,
+  to_char(b.booking_date, 'YYYY-MM-DD') AS booking_date,
+  b.booking_time,
+  b.location,
+  b.status,
+  b.created_at,
+  b.updated_at,
+  s.name AS service_name,
+  bs.name AS barbershop_name,
+  bs.primary_color,
+  bs.accent_color
 `;
 
 const model = {
   async createBooking(bookingData) {
     const { rows } = await pool.query(
-      `INSERT INTO bookings (client_name, client_phone, confirmation_code, booking_date, booking_time, location, status)
-       VALUES ($1, $2, $3, $4, $5, $6, 'pending')
-       RETURNING ${SELECT_FIELDS}`,
+      `INSERT INTO bookings (
+         barbershop_id, service_id, client_name, client_phone,
+         confirmation_code, booking_date, booking_time, location, status
+       )
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending')
+       RETURNING id, barbershop_id, service_id, client_name, client_phone,
+         confirmation_code, to_char(booking_date, 'YYYY-MM-DD') AS booking_date,
+         booking_time, location, status, created_at, updated_at`,
       [
+        bookingData.barbershopId,
+        bookingData.serviceId,
         bookingData.name,
         bookingData.phone,
         bookingData.confirmationCode,
@@ -32,84 +43,77 @@ const model = {
     );
     return rows[0];
   },
+
   async findBookingById(id, confirmationCode) {
     const { rows } = await pool.query(
-      `SELECT ${SELECT_FIELDS} FROM bookings WHERE id = $1 AND confirmation_code = $2`,
+      `SELECT ${BOOKING_FIELDS}
+       FROM bookings b
+       JOIN barbershops bs ON bs.id = b.barbershop_id
+       JOIN services s ON s.id = b.service_id AND s.barbershop_id = b.barbershop_id
+       WHERE b.id = $1 AND b.confirmation_code = $2`,
       [id, confirmationCode]
     );
     return rows[0] || null;
   },
-  async findAllBookings() {
-    const { rows } = await pool.query(
-      `SELECT ${SELECT_FIELDS} FROM bookings ORDER BY booking_date, booking_time`
-    );
-    return rows;
-  },
-  async updateBookingStatus(id, status) {
-    const { rows } = await pool.query(
-      `UPDATE bookings SET status = $1, updated_at = now() WHERE id = $2 RETURNING ${SELECT_FIELDS}`,
-      [status, id]
-    );
-    return rows[0] || null;
-  },
-  async findTakenSlotsByDate(date) {
-    const { rows } = await pool.query(
-      `SELECT booking_time FROM bookings WHERE booking_date = $1 AND status != 'rejected'`,
-      [date]
-    );
-    return rows.map((r) => r.booking_time);
-  },
-};
-/*
-export const model = {
-  
-  createBooking: async function (bookingData) {
-    const { rows } = await pool.query(
-      `INSERT INTO bookings (client_name, client_phone, booking_date, booking_time, location, status)
-       VALUES ($1, $2, $3, $4, $5, 'pending')
-       RETURNING ${SELECT_FIELDS}`,
-      [
-        bookingData.name,
-        bookingData.phone,
-        bookingData.date,
-        bookingData.time,
-        bookingData.location,
-      ],
-    );
-    return rows[0];
-  },
 
-  findBookingById: async function (id) {
+  async findBookingsByOwnerIdAndDate(ownerId, date) {
     const { rows } = await pool.query(
-      `SELECT ${SELECT_FIELDS} FROM bookings WHERE id = $1`,
-      [id],
-    );
-    return rows[0] || null;
-  },
-
-  findAllBookings: async function () {
-    const { rows } = await pool.query(
-      `SELECT ${SELECT_FIELDS} FROM bookings ORDER BY booking_date, booking_time`,
+      `SELECT ${BOOKING_FIELDS}
+       FROM bookings b
+       JOIN barbershops bs ON bs.id = b.barbershop_id
+       JOIN services s ON s.id = b.service_id AND s.barbershop_id = b.barbershop_id
+       WHERE bs.owner_id = $1 AND b.booking_date = $2
+       ORDER BY b.booking_time`,
+      [ownerId, date]
     );
     return rows;
   },
 
-  updateBookingStatus: async function (id, status) {
+  async updateStatusByOwnerId(id, ownerId, status) {
     const { rows } = await pool.query(
-      `UPDATE bookings SET status = $1, updated_at = now() WHERE id = $2 RETURNING ${SELECT_FIELDS}`,
-      [status, id],
+      `WITH updated AS (
+         UPDATE bookings b
+         SET status = $3, updated_at = now()
+         FROM barbershops bs
+         WHERE b.id = $1
+           AND bs.id = b.barbershop_id
+           AND bs.owner_id = $2
+         RETURNING b.*
+       )
+       SELECT ${BOOKING_FIELDS}
+       FROM updated b
+       JOIN barbershops bs ON bs.id = b.barbershop_id
+       JOIN services s ON s.id = b.service_id AND s.barbershop_id = b.barbershop_id`,
+      [id, ownerId, status]
     );
     return rows[0] || null;
   },
 
-  findTakenSlotsByDate: async function (date) {
+  async findActiveServiceForBarbershop(serviceId, barbershopId) {
     const { rows } = await pool.query(
-      `SELECT booking_time FROM bookings WHERE booking_date = $1 AND status != 'rejected'`,
-      [date],
+      `SELECT s.id, s.barbershop_id
+       FROM services s
+       JOIN barbershops bs ON bs.id = s.barbershop_id
+       WHERE s.id = $1
+         AND s.barbershop_id = $2
+         AND s.active = true
+         AND bs.active = true`,
+      [serviceId, barbershopId]
     );
-    return rows.map((r) => r.booking_time);
+    return rows[0] || null;
+  },
+
+  async findTakenSlotsByDate(date, barbershopId) {
+    const { rows } = await pool.query(
+      `SELECT booking_time
+       FROM bookings
+       WHERE booking_date = $1
+         AND barbershop_id = $2
+         AND status != 'rejected'`,
+      [date, barbershopId]
+    );
+    return rows.map((row) => row.booking_time);
   },
 };
-*/
 
 export default model;

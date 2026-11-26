@@ -1,14 +1,67 @@
--- Hairspace — dados iniciais (mesmos que hoje estão fixos no front)
--- Rodar com: npm run db:seed (depois do db:setup)
+-- Dados fictícios para desenvolvimento local; rodar com npm run db:seed.
 
-INSERT INTO services (icon, name, description, price_cents, duration_minutes) VALUES
-  ('✂️', 'Corte Clássico', 'Tesoura ou máquina, acabamento perfeito com detalhes no contorno.', 4500, 30),
-  ('🪒', 'Barba Completa', 'Modelagem com navalha, toalha quente e bálsamo hidratante.', 3500, 25),
-  ('💈', 'Corte + Barba', 'O combo completo para quem quer sair renovado do salão.', 7000, 55),
-  ('🧴', 'Hidratação Capilar', 'Tratamento profundo com produtos premium para cabelos secos ou danificados.', 5000, 40),
-  ('👶', 'Corte Infantil', 'Para os pequenos (até 12 anos). Atenção especial e ambiente tranquilo.', 3000, 25),
-  ('⚡', 'Pigmentação de Barba', 'Correção de falhas e uniformização da cor da barba.', 6000, 45)
-ON CONFLICT DO NOTHING;
+INSERT INTO users (name, email, password_hash, role) VALUES
+  ('Admin Horizonte', 'admin.horizonte@hairspace.test', '$2b$12$f9rftQ3Jfz3Wvie7bMUXSeKloyuXm1525Q4Nhy6cv3pcMyjxFAHPm', 'admin'),
+  ('Admin Navalha', 'admin.navalha@hairspace.test', '$2b$12$ARBlIHXr9rw/C388/qax9eYIgdIbRFH6VESTqJkVe.QPzjOjTPjc2', 'admin'),
+  ('Admin Ponto e Corte', 'admin.pontoecorte@hairspace.test', '$2b$12$ZNLyX10R.j8VLxjRbCW.tueDdLNcpvVyAVxIbzLH476kfs9IiowkO', 'admin'),
+  ('Admin Casa do Barbeiro', 'admin.casa@hairspace.test', '$2b$12$pgVCitdGZCYlrTrZJze7c.jRhc9MAEGQi0qidM/QyN.VbkrXS3p/6', 'admin'),
+  ('Admin Oficina da Barba', 'admin.oficina@hairspace.test', '$2b$12$4TSxwZh.5WtLL4pwtArXf.zn3qK3Myx7RaNd6MSDnBU71AHWB6TEG', 'admin')
+ON CONFLICT (email) DO UPDATE SET
+  name = EXCLUDED.name,
+  password_hash = EXCLUDED.password_hash,
+  role = EXCLUDED.role;
+
+INSERT INTO barbershops (
+  owner_id, name, address, latitude, longitude, primary_color, accent_color
+)
+SELECT
+  u.id, seed.name, seed.address, seed.latitude, seed.longitude,
+  seed.primary_color, seed.accent_color
+FROM (
+  VALUES
+    ('admin.horizonte@hairspace.test', 'Barbearia Horizonte', 'Rua das Araucárias, 100, Centro, Curitiba - PR', -25.428400, -49.273300, '#1F3A5F', '#F4A261'),
+    ('admin.navalha@hairspace.test', 'Navalha Fina', 'Alameda dos Ipês, 215, Batel, Curitiba - PR', -25.435100, -49.282000, '#6B2147', '#E9AFC3'),
+    ('admin.pontoecorte@hairspace.test', 'Ponto e Corte', 'Rua do Relógio Imaginário, 38, Rebouças, Curitiba - PR', -25.441700, -49.266100, '#365314', '#D9ED92'),
+    ('admin.casa@hairspace.test', 'Casa do Barbeiro', 'Travessa das Navalhas, 72, Água Verde, Curitiba - PR', -25.451200, -49.278900, '#075985', '#FACC15'),
+    ('admin.oficina@hairspace.test', 'Oficina da Barba', 'Rua do Bigode Fictício, 9, Centro Cívico, Curitiba - PR', -25.419900, -49.270500, '#7C2D12', '#FDBA74')
+) AS seed(email, name, address, latitude, longitude, primary_color, accent_color)
+JOIN users u ON u.email = seed.email
+ON CONFLICT (owner_id) DO UPDATE SET
+  name = EXCLUDED.name,
+  address = EXCLUDED.address,
+  latitude = EXCLUDED.latitude,
+  longitude = EXCLUDED.longitude,
+  primary_color = EXCLUDED.primary_color,
+  accent_color = EXCLUDED.accent_color,
+  active = true;
+
+INSERT INTO services (
+  barbershop_id, icon, name, description, price_cents, duration_minutes
+)
+SELECT b.id, service.icon, service.name, service.description,
+  service.price_cents, service.duration_minutes
+FROM barbershops b
+CROSS JOIN (
+  VALUES
+    ('✂️', 'Corte Clássico', 'Corte com acabamento e contorno.', 4500, 30),
+    ('🪒', 'Barba Completa', 'Modelagem de barba e toalha quente.', 3500, 25),
+    ('💈', 'Corte + Barba', 'Corte e modelagem de barba.', 7000, 55)
+) AS service(icon, name, description, price_cents, duration_minutes)
+WHERE b.owner_id IN (
+  SELECT id FROM users WHERE email IN (
+    'admin.horizonte@hairspace.test',
+    'admin.navalha@hairspace.test',
+    'admin.pontoecorte@hairspace.test',
+    'admin.casa@hairspace.test',
+    'admin.oficina@hairspace.test'
+  )
+)
+ON CONFLICT (barbershop_id, name) DO UPDATE SET
+  icon = EXCLUDED.icon,
+  description = EXCLUDED.description,
+  price_cents = EXCLUDED.price_cents,
+  duration_minutes = EXCLUDED.duration_minutes,
+  active = true;
 
 INSERT INTO products (image_url, name, brand, price_cents) VALUES
   ('https://images.unsplash.com/photo-1587909209111-5097ee578ec3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400', 'Pomada Modeladora Matte', 'Hairspace', 4800),
@@ -25,10 +78,3 @@ INSERT INTO portfolio_photos (image_url, label, sort_order) VALUES
   ('https://images.unsplash.com/photo-1593702233354-259d1f794ed1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600', 'Textura alta', 5),
   ('https://images.unsplash.com/photo-1759134198561-e2041049419c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600', 'Estilo vintage', 6)
 ON CONFLICT DO NOTHING;
-
--- Usuário admin de exemplo para logar no painel do barbeiro (rotas /auth/login).
--- Login: admin@hairspace.com | Senha: troque-esta-senha
--- TROQUE a senha em produção (gere um novo hash com bcrypt.hash antes de subir).
-INSERT INTO users (name, email, password_hash, role) VALUES
-  ('Barbeiro Admin', 'admin@hairspace.com', '$2b$10$m3mnb6QWCJFpnH5pm62u0.8r8i0rsXlUdPBC91p6UyVVPNS5mOofK', 'barber')
-ON CONFLICT (email) DO NOTHING;

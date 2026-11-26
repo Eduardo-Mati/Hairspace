@@ -2,6 +2,16 @@ import { pool } from "../config/db.js";
 
 
 const model = {
+  async findUserByEmail(email) {
+    const { rows } = await pool.query(
+      `SELECT id, name, email, password_hash, role
+       FROM users
+       WHERE email = $1`,
+      [email]
+    );
+    return rows[0] || null;
+  },
+
   async createUser(userData) {
     const { rows } = await pool.query(
       `INSERT INTO users (name, email, password_hash, role)

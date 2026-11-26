@@ -7,8 +7,10 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
+    "test": "node --test",
     "db:setup": "node src/config/runSql.js db/schema.sql",
-    "db:seed": "node src/config/runSql.js db/seed.sql"
+    "db:seed": "node src/config/runSql.js db/seed.sql",
+    "db:reset": "node src/config/resetDb.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

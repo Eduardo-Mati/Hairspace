@@ -6,12 +6,14 @@
 |---|---|
 | `Push-Location Frontend; npm run lint; npm run build; Pop-Location` | Regras Oxlint e bundle de produção |
 | `Push-Location Backend; node --check index.js; Get-ChildItem src -Recurse -Filter *.js \| ForEach-Object { node --check $_.FullName }; Pop-Location` | Sintaxe de todos os módulos JS |
-| `Push-Location Backend; npm run db:setup; npm run db:seed; Pop-Location` | Schema e dados em PostgreSQL autorizado |
+| `Push-Location Backend; npm run db:reset; Pop-Location` | Recria schema e seed; o comando só aceita `DATABASE_URL` de localhost |
 | `npm audit --omit=dev --audit-level=high` em cada aplicação | Vulnerabilidades de dependências de produção |
 
-Não há suíte de testes automatizados, typecheck ou CI versionados no estado
-observado. Não foi instalado ESLint/TypeScript apenas para satisfazer um
-checklist: Oxlint e JavaScript são as ferramentas existentes.
+Há testes HTTP de API com `node --test` em `Backend/test/`; eles exigem
+`DATABASE_URL` apontando para localhost e para o banco descartável
+`hairspace_test`. Não há typecheck ou CI versionados. Não foi instalado
+ESLint/TypeScript apenas para satisfazer um checklist: Oxlint e JavaScript são
+as ferramentas existentes.
 
 ## Baseline e critérios
 
@@ -22,10 +24,9 @@ proteções e manter build e sintaxe passando.
 
 ## Testes futuros
 
-Prioridade: testes de controller para validação de datas/horários, concorrência
-de reservas e autenticação; depois um fluxo HTTP com PostgreSQL descartável.
-Mocks, geração de SQL e banco real devem ser registrados como evidências
-distintas.
+Expandir a suíte para cobrir a validação de datas/horários, concorrência de
+reservas e demais fluxos públicos. Mocks, geração de SQL e banco real devem ser
+registrados como evidências distintas.
 
 ## Revisão
 
