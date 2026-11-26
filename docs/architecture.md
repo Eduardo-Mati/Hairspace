@@ -8,8 +8,9 @@ O repositório contém duas aplicações independentes:
 Frontend (React/Vite) -> HTTP/JSON -> Backend (Express) -> PostgreSQL
 ```
 
-O frontend usa `VITE_API_URL` e não acessa o banco. O backend monta os routers
-em `index.js`, valida entradas nos controllers e concentra SQL nos models.
+O frontend usa `VITE_API_URL` e não acessa o banco. `src/app.js` monta os
+routers; `index.js` inicia o servidor. O backend valida entradas nos
+controllers e concentra SQL nos models.
 
 ## Backend
 
@@ -17,6 +18,7 @@ em `index.js`, valida entradas nos controllers e concentra SQL nos models.
 - `src/controllers/` valida a requisição e monta a resposta.
 - `src/models/` executa queries via o pool compartilhado.
 - `src/middlewares/` contém autenticação JWT e tratamento de erros.
+- `src/app.js` monta o Express e os routers; `index.js` inicia o servidor HTTP.
 - `db/schema.sql` e `db/seed.sql` são a fonte do schema e dos dados locais.
 - Cada barbearia tem um admin; serviços e reservas pertencem a uma barbearia,
   enquanto produtos e fotos do portfólio continuam globais.

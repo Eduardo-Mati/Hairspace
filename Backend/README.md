@@ -3,7 +3,8 @@
 ## Arquitetura
 
 ```
-index.js                → só cria o app Express e monta os routers
+src/app.js              → cria o app Express e monta os routers
+index.js                → inicia o servidor HTTP
 src/routes/*.routes.js  → só define URL + método HTTP, chama o controller
 src/controllers/*.js    → recebe req, valida entrada, chama o model, monta a resposta
 src/models/*.model.js   → toda query SQL fica aqui (usa o pool do src/config/db.js)
@@ -14,7 +15,7 @@ db/seed.sql             → popula cinco barbearias fictícias, serviços e cat�
 
 Fluxo de uma requisição, por exemplo `GET /services`:
 
-`index.js` → `services.routes.js` → `services.controller.js` (chama o model) → `services.model.js` (faz o SELECT) → volta pro controller → `res.json(...)`.
+`index.js` → `src/app.js` → `services.routes.js` → `services.controller.js` (chama o model) → `services.model.js` (faz o SELECT) → volta pro controller → `res.json(...)`.
 
 Nenhum router chama o banco diretamente, e nenhum model sabe nada sobre req/res do Express, cada camada só conhece a camada logo abaixo dela.
 
@@ -29,6 +30,18 @@ Nenhum router chama o banco diretamente, e nenhum model sabe nada sobre req/res 
 recusa qualquer `DATABASE_URL` que não aponte para localhost; use apenas um
 banco local descartável. `npm run db:setup` e `npm run db:seed` continuam
 disponíveis para execução manual.
+
+### Testes automatizados
+
+`npm test` executa testes HTTP com `node --test`. Crie `hairspace_test` como
+banco UTF-8 no PostgreSQL local, usando `template0` e `encoding=UTF8`. A
+variável `DATABASE_URL` deve ser definida somente na sessão do terminal e
+apontar para esse banco. A suíte recusa outro host ou nome de banco e limpa as
+tabelas desse banco antes de cada caso e ao final da execução.
+
+Inicialize o schema do banco de teste uma vez com `npm run db:reset`, depois
+de confirmar que a URL da sessão aponta para localhost e para
+`hairspace_test`. Não use o banco de desenvolvimento para os testes.
 
 ## Endpoints
 

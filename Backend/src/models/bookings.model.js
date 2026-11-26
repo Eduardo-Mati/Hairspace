@@ -78,11 +78,10 @@ const model = {
          WHERE b.id = $1
            AND bs.id = b.barbershop_id
            AND bs.owner_id = $2
-         RETURNING b.id
+         RETURNING b.*
        )
        SELECT ${BOOKING_FIELDS}
-       FROM updated u
-       JOIN bookings b ON b.id = u.id
+       FROM updated b
        JOIN barbershops bs ON bs.id = b.barbershop_id
        JOIN services s ON s.id = b.service_id AND s.barbershop_id = b.barbershop_id`,
       [id, ownerId, status]
